@@ -3,55 +3,127 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
 
-namespace YTW_Test
+public class PlayerController : MonoBehaviour
 {
-    public class PlayerController : MonoBehaviour
+    private PlayerStatus _status;
+    private PlayerMovement _movement;
+
+    [SerializeField] private GameObject _aimCamera;
+    private GameObject _mainCamera;
+
+    [SerializeField] private KeyCode _aimKey = KeyCode.Mouse1;
+
+    public bool IsControlActivate { get; set; } = true;
+    private void Awake()
     {
-        public PlayerMovement _movement;
-        public PlayerStatus _status;
+        Init();
+    }
 
-        /// <summary>
-        /// 아래 메서드에 적힌 소스코드와 같은 방식으로 사용합니다.
-        /// </summary>
-        private void Update()
-        {
-            MoveTest();
+    private void OnEnable()
+    {
+        SubscribeEvents();
+    }
 
-            // IsAiming 변경용 테스트 코드
-            _status.IsAiming.Value = Input.GetKey(KeyCode.Mouse1);
-        }
+    private void Update()
+    {
+        HandlePlayerControl();
+    }
 
-        public void MoveTest()
-        {
-            // (회전 수행 후) 좌우 회전에 대한 벡터 반환
-            Vector3 camRotateDir = _movement.SetAimRotation();
+    private void OnDisable()
+    {
+        UnSubscribeEvents();
+    }
 
-            float moveSpeed;
-            if (_status.IsAiming.Value == true)
-            {
-                moveSpeed = _status.WalkSpeed;
-            }
-            else
-            {
-                moveSpeed = _status.RunSpeed;
-            }
+    private void Init()
+    {
+        _status = GetComponent<PlayerStatus>();
+        _movement = GetComponent<PlayerMovement>();
+        _mainCamera = Camera.main.gameObject;
+    }
+    
+    private void HandlePlayerControl()
+    {
+        if (!IsControlActivate) return;
 
-            Vector3 moveDir = _movement.SetMove(moveSpeed);
-            _status.IsMoving.Value = (moveDir != Vector3.zero);
+        HandleMovement();
+        HandleAiming();
+    }
 
-            // TODO : 몸체의 회전 구현
-            Vector3 avatarDir;
-            if(_status.IsAiming.Value)
-            {
-                avatarDir = camRotateDir;
-            }
-            else
-            {
-                avatarDir = moveDir;
-            }
+    private void HandleMovement()
+    {
+        
+    }
 
-            _movement.SetAvatarRotation(avatarDir);
-        }
+    private void HandleAiming()
+    {
+        _status.IsAiming.Value = Input.GetKey(_aimKey);
+    }
+
+    private void SubscribeEvents()
+    {
+        _status.IsAiming.Subscribe(value => SetActivateAimCamera(value));
+    }
+
+    private void UnSubscribeEvents()
+    {
+        _status.IsAiming.Unsubscribe(value => SetActivateAimCamera(value));
+    }
+
+    private void SetActivateAimCamera(bool value)
+    {
+        _aimCamera.SetActive(value);
+        _mainCamera.SetActive(!value);
     }
 }
+//namespace YTW_Test
+//{
+//    public class PlayerController : MonoBehaviour
+//    {
+//        public PlayerMovement _movement;
+//        public PlayerStatus _status;
+
+//        /// <summary>
+//        /// 아래 메서드에 적힌 소스코드와 같은 방식으로 사용합니다.
+//        /// </summary>
+//        private void Update()
+//        {
+//            MoveTest();
+
+//            // IsAiming 변경용 테스트 코드
+//            _status.IsAiming.Value = Input.GetKey(KeyCode.Mouse1);
+//        }
+
+//        public void MoveTest()
+//        {
+//            // (회전 수행 후) 좌우 회전에 대한 벡터 반환
+//            Vector3 camRotateDir = _movement.SetAimRotation();
+
+//            float moveSpeed;
+//            if (_status.IsAiming.Value == true)
+//            {
+//                moveSpeed = _status.WalkSpeed;
+//            }
+//            else
+//            {
+//                moveSpeed = _status.RunSpeed;
+//            }
+
+//            Vector3 moveDir = _movement.SetMove(moveSpeed);
+//            _status.IsMoving.Value = (moveDir != Vector3.zero);
+
+//            // 에임조준상태라면 플레이어를 카메라가 보는 방향으로 회전
+//            Vector3 avatarDir;
+//            if(_status.IsAiming.Value)
+//            {
+//                avatarDir = camRotateDir;
+//            }
+//            else
+//            {
+//                avatarDir = moveDir;
+//            }
+
+//            _movement.SetAvatarRotation(avatarDir);
+//        }
+//    }
+//}
 
