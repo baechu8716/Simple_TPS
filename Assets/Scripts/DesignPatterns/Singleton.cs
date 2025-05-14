@@ -32,6 +32,7 @@ namespace DesignPattern
             else
             {
                 //_instance = GetComponent<T>();
+                // 안전하게 다운캐스팅
                 _instance = this as T;
                 DontDestroyOnLoad(_instance);
             }
