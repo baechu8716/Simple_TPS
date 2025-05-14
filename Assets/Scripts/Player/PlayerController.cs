@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -5,15 +6,15 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public bool IsControlActivate { get; set; } = true;
+
     private PlayerStatus _status;
     private PlayerMovement _movement;
 
-    [SerializeField] private GameObject _aimCamera;
-    private GameObject _mainCamera;
-
+    [SerializeField] private CinemachineVirtualCamera _aimCamera;
     [SerializeField] private KeyCode _aimKey = KeyCode.Mouse1;
 
-    public bool IsControlActivate { get; set; } = true;
+   
     private void Awake()
     {
         Init();
@@ -38,7 +39,7 @@ public class PlayerController : MonoBehaviour
     {
         _status = GetComponent<PlayerStatus>();
         _movement = GetComponent<PlayerMovement>();
-        _mainCamera = Camera.main.gameObject;
+        // _mainCamera = Camera.main.gameObject;
     }
     
     private void HandlePlayerControl()
@@ -51,7 +52,20 @@ public class PlayerController : MonoBehaviour
 
     private void HandleMovement()
     {
-        
+        Vector3 camRotateDir = _movement.SetAimRotation();
+
+        float moveSpeed;
+        if (_status.IsAiming.Value) moveSpeed = _status.WalkSpeed;
+        else moveSpeed = _status.RunSpeed;
+
+        Vector3 moveDir = _movement.SetMove(moveSpeed);
+        _status.IsMoving.Value = (moveDir != Vector3.zero);
+
+        Vector3 avatarDir;
+        if (_status.IsAiming.Value) avatarDir = camRotateDir;
+        else avatarDir = moveDir;
+
+        _movement.SetAvatarRotation(avatarDir);
     }
 
     private void HandleAiming()
@@ -61,19 +75,14 @@ public class PlayerController : MonoBehaviour
 
     private void SubscribeEvents()
     {
-        _status.IsAiming.Subscribe(value => SetActivateAimCamera(value));
+        _status.IsAiming.Subscribe(_aimCamera.gameObject.SetActive);
     }
 
     private void UnSubscribeEvents()
     {
-        _status.IsAiming.Unsubscribe(value => SetActivateAimCamera(value));
+        _status.IsAiming.Unsubscribe(_aimCamera.gameObject.SetActive);
     }
 
-    private void SetActivateAimCamera(bool value)
-    {
-        _aimCamera.SetActive(value);
-        _mainCamera.SetActive(!value);
-    }
 }
 //namespace YTW_Test
 //{
