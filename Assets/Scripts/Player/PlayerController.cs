@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
 
     private PlayerStatus _status;
     private PlayerMovement _movement;
+    private Animator _animator;
 
     [SerializeField] private CinemachineVirtualCamera _aimCamera;
     [SerializeField] private KeyCode _aimKey = KeyCode.Mouse1;
@@ -39,6 +40,7 @@ public class PlayerController : MonoBehaviour
     {
         _status = GetComponent<PlayerStatus>();
         _movement = GetComponent<PlayerMovement>();
+        _animator = GetComponent<Animator>();
         // _mainCamera = Camera.main.gameObject;
     }
     
@@ -83,6 +85,7 @@ public class PlayerController : MonoBehaviour
         _status.IsAiming.Unsubscribe(_aimCamera.gameObject.SetActive);
     }
 
+    private void SetAimAnimation(bool value) => _animator.SetBool("IsAim", value);
 }
 //namespace YTW_Test
 //{
