@@ -12,16 +12,17 @@ namespace DesignPattern
         private PooledObject _targetPrefab;
         private GameObject _poolObject;
 
-        public ObjectPool(PooledObject targetPrefab, int initSize = 5)
+        public ObjectPool(PooledObject targetPrefab, Transform parent, int initSize = 5)
         {
-            Init(targetPrefab, initSize);
+            Init(targetPrefab, parent, initSize);
         }
 
-        private void Init(PooledObject targetPrefab, int initSize)
+        private void Init(PooledObject targetPrefab, Transform parent, int initSize)
         {
             _stack = new Stack<PooledObject>(initSize);
             _targetPrefab = targetPrefab;
             _poolObject = new GameObject($"{targetPrefab.name}_Pool");
+            _poolObject.transform.parent = parent;
 
             for (int i = 0; i < initSize; i++)
             {

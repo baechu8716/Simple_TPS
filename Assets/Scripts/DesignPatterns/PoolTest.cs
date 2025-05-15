@@ -10,10 +10,7 @@ public class PoolTest : MonoBehaviour
     private ObjectPool _pool;
     private PooledObject _temp;
 
-    private void Awake()
-    {
-        _pool = new ObjectPool(_prefab, 10);
-    }
+    
 
     //private void Awake()
     //{
