@@ -61,6 +61,7 @@ public class PlayerController : MonoBehaviour
         else moveSpeed = _status.RunSpeed;
 
         Vector3 moveDir = _movement.SetMove(moveSpeed);
+        // ÀÌº¥Æ® 
         _status.IsMoving.Value = (moveDir != Vector3.zero);
 
         Vector3 avatarDir;
@@ -68,6 +69,14 @@ public class PlayerController : MonoBehaviour
         else avatarDir = moveDir;
 
         _movement.SetAvatarRotation(avatarDir);
+
+        // SetAnimationParameter
+        if(_status.IsAiming.Value)
+        {
+            Vector3 input = _movement.GetInputDirection();
+            _animator.SetFloat("X", input.x);
+            _animator.SetFloat("Z", input.z);
+        }
     }
 
     private void HandleAiming()
@@ -77,15 +86,23 @@ public class PlayerController : MonoBehaviour
 
     private void SubscribeEvents()
     {
+        _status.IsMoving.Subscribe(SetMoveAnimaion);
+
         _status.IsAiming.Subscribe(_aimCamera.gameObject.SetActive);
+        _status.IsAiming.Subscribe(SetAimAnimation);
     }
 
     private void UnSubscribeEvents()
     {
+        _status.IsMoving.Unsubscribe(SetMoveAnimaion);
+
         _status.IsAiming.Unsubscribe(_aimCamera.gameObject.SetActive);
+        _status.IsAiming.Unsubscribe(SetAimAnimation);
     }
 
     private void SetAimAnimation(bool value) => _animator.SetBool("IsAim", value);
+
+    private void SetMoveAnimaion(bool value) => _animator.SetBool("IsMove", value);
 }
 //namespace YTW_Test
 //{
