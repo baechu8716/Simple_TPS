@@ -104,7 +104,8 @@ public class PlayerController : MonoBehaviour
 
         _status.IsAiming.Subscribe(_aimCamera.gameObject.SetActive);
         _status.IsAiming.Subscribe(SetAimAnimation);
-        _status.IsAiming.Subscribe(SetAttackAnimation);
+
+        _status.IsAttacking.Subscribe(SetAttackAnimation);
     }
 
     private void UnSubscribeEvents()
@@ -113,7 +114,8 @@ public class PlayerController : MonoBehaviour
 
         _status.IsAiming.Unsubscribe(_aimCamera.gameObject.SetActive);
         _status.IsAiming.Unsubscribe(SetAimAnimation);
-        _status.IsAiming.Unsubscribe(SetAttackAnimation);
+
+        _status.IsAttacking.Unsubscribe(SetAttackAnimation);
     }
 
     private void SetAimAnimation(bool value) => _animator.SetBool("IsAim", value);
