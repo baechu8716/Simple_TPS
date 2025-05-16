@@ -14,18 +14,18 @@ public class SFXController : PooledObject
         Init();
     }
 
-    //private void Update()
-    //{
-    //    // 한 프레임이 갱신될때까지의 시간 =  DletaTime
-    //    _currentCount -= Time.deltaTime;
+    private void Update()
+    {
+        // 한 프레임이 갱신될때까지의 시간 =  DletaTime
+        _currentCount -= Time.deltaTime;
 
-    //    if (_currentCount <= 0)
-    //    {
-    //        _audioSource.Stop();
-    //        _audioSource.clip = null;
-    //        ReturnPool();
-    //    }
-    //}
+        if (_currentCount <= 0)
+        {
+            _audioSource.Stop();
+            _audioSource.clip = null;
+            ReturnPool();
+        }
+    }
 
     private void Init()
     {
