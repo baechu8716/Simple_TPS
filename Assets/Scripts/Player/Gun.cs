@@ -15,6 +15,7 @@ public class Gun : MonoBehaviour
     [SerializeField] private int _shootDamage;
     [SerializeField] private float _shootDelay;
     [SerializeField] private AudioClip _shootSFX;
+    [SerializeField] private GameObject _firePartcle;
 
     private CinemachineImpulseSource _impulse;
     private Camera _camera;
@@ -46,14 +47,19 @@ public class Gun : MonoBehaviour
         PlayShootEffect();
         _currentCount = _shootDelay;
 
-        // TODO : Ray 발사 -> 반화받은 대상에게 데미지 부여. 몬스터 구현시 같이 구현
-        IDamagable target = RayShoot();
+        RaycastHit hit;
+        IDamagable target = RayShoot(out hit);
+
+        if(!hit.Equals(default))
+        {
+            PlayFireEffect(hit.point, Quaternion.LookRotation(hit.normal));
+
+        }
 
         if (target == null) return true;
 
         target.TakeDamage(_shootDamage);
 
-        // ------------------------------------------ 
 
         return true;
     }
@@ -64,22 +70,33 @@ public class Gun : MonoBehaviour
         _currentCount -= Time.deltaTime;
     }
 
-    private IDamagable RayShoot()
+    private IDamagable RayShoot(out RaycastHit hitTarget)
     {
         Ray ray = new Ray(_camera.transform.position, _camera.transform.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, _attackRange, _targetLayer))
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, _attackRange))
         {
-            // TODO : 몬스터를 어떻게 구현하는가에 따라 다름
+            hitTarget = hit;
 
-            // ex : IDamagable를 상속받는 몬스터
-            // ??? 이 부분을 어떻게 우회해야 할까
-            return ReferenceRegistry.GetProvider(hit.collider.gameObject).
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Monster"))
+            {
+                return ReferenceRegistry.GetProvider(hit.collider.gameObject).
                 GetAs<NormalMonster>();
-
-            // ---------------------------------
+            }
+                  
         }
-
+        else
+        {
+            hitTarget = default;
+        }
+            
         return null;
+    }
+
+    private void PlayFireEffect(Vector3 position, Quaternion rotation)
+    {
+        Instantiate(_firePartcle, position, rotation);
+
     }
 
     private void PlayShootSound()
